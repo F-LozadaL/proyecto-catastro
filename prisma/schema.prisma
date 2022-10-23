@@ -1,0 +1,90 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider          =     "postgresql"
+  url               = env("DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+}
+
+model Predio {
+  id         BigInt         @id @default(autoincrement())
+  appraise   Int
+  name       String         
+  department String
+  city       String
+  owner      Propietario[]
+  buildings  Construccion[]
+  lands      Terreno[]
+  @@index([appraise])
+}
+
+model Propietario {
+  id            BigInt   @id
+  id_type       DocumentType
+  names         String
+  lastnames     String
+  address       String
+  phone         String   @unique
+  person_type   PersonType
+  NIT           BigInt?
+  business_name String?
+  email         String?  @unique
+  terriory      Predio[]
+}
+
+model Construccion {
+  id       BigInt  @id
+  area_m2  Float
+  type     BuildingType 
+  floors   Int
+  address  String
+  predio   Predio? @relation(fields: [predioId], references: [id])
+  predioId BigInt?
+}
+
+model Terreno {
+  id             BigInt @id
+  area_m2        Float
+  value          Int
+  water          Boolean
+  territory_type TerritoryType
+  Buildings      Boolean
+  Predio         Predio? @relation(fields: [predioId], references: [id])
+  predioId       BigInt?
+}
+
+model test{
+  id Int @default(autoincrement()) @id
+  name String 
+}
+
+enum PersonType{
+  NATURAL 
+  JURIDICA
+}
+
+enum DocumentType{
+  CEDULA_DE_CIUDADANIA 
+  CEDULA_DE_EXTRANJERIA
+  NUMERO_DE_IDENTIFICACION_PERSONAL
+  NUMERO_DE_IDENTIFICACION_TRIBUTARIA
+  TARJETA_DE_IDENTIDAD
+  PASAPORTE
+}
+
+enum BuildingType{
+  INDUSTRIAL
+  COMERCIAL
+  RESIDENCIAL
+}
+
+enum TerritoryType{
+  URBANO
+  RURAL
+}
+
