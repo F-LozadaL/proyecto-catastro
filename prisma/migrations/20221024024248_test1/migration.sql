@@ -12,9 +12,8 @@ CREATE TYPE "TerritoryType" AS ENUM ('URBANO', 'RURAL');
 
 -- CreateTable
 CREATE TABLE "Predio" (
-    "id" BIGSERIAL NOT NULL,
+    "id" SERIAL NOT NULL,
     "appraise" INTEGER NOT NULL,
-    "name" TEXT NOT NULL,
     "department" TEXT NOT NULL,
     "city" TEXT NOT NULL,
 
@@ -23,7 +22,7 @@ CREATE TABLE "Predio" (
 
 -- CreateTable
 CREATE TABLE "Propietario" (
-    "id" BIGINT NOT NULL,
+    "id" INTEGER NOT NULL,
     "id_type" "DocumentType" NOT NULL,
     "names" TEXT NOT NULL,
     "lastnames" TEXT NOT NULL,
@@ -39,25 +38,25 @@ CREATE TABLE "Propietario" (
 
 -- CreateTable
 CREATE TABLE "Construccion" (
-    "id" BIGINT NOT NULL,
+    "id" INTEGER NOT NULL,
     "area_m2" DOUBLE PRECISION NOT NULL,
     "type" "BuildingType" NOT NULL,
     "floors" INTEGER NOT NULL,
     "address" TEXT NOT NULL,
-    "predioId" BIGINT,
+    "predioId" INTEGER,
 
     CONSTRAINT "Construccion_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "Terreno" (
-    "id" BIGINT NOT NULL,
+    "id" INTEGER NOT NULL,
     "area_m2" DOUBLE PRECISION NOT NULL,
     "value" INTEGER NOT NULL,
     "water" BOOLEAN NOT NULL,
     "territory_type" "TerritoryType" NOT NULL,
     "Buildings" BOOLEAN NOT NULL,
-    "predioId" BIGINT,
+    "predioId" INTEGER,
 
     CONSTRAINT "Terreno_pkey" PRIMARY KEY ("id")
 );
@@ -72,8 +71,8 @@ CREATE TABLE "test" (
 
 -- CreateTable
 CREATE TABLE "_PredioToPropietario" (
-    "A" BIGINT NOT NULL,
-    "B" BIGINT NOT NULL
+    "A" INTEGER NOT NULL,
+    "B" INTEGER NOT NULL
 );
 
 -- CreateIndex

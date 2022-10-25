@@ -12,9 +12,8 @@ datasource db {
 }
 
 model Predio {
-  id         BigInt         @id @default(autoincrement())
-  appraise   Int
-  name       String         
+  id         Int         @id @default(autoincrement())
+  appraise   Int      
   department String
   city       String
   owner      Propietario[]
@@ -24,38 +23,38 @@ model Predio {
 }
 
 model Propietario {
-  id            BigInt   @id
+  id            Int       @id
   id_type       DocumentType
   names         String
   lastnames     String
   address       String
-  phone         String   @unique
+  phone         String       @unique
   person_type   PersonType
-  NIT           BigInt?
-  business_name String?
-  email         String?  @unique
-  terriory      Predio[]
+  NIT           BigInt      ?
+  business_name String      ?
+  email         String      ? @unique
+  terriory      Predio      []
 }
 
 model Construccion {
-  id       BigInt  @id
+  id       Int  @id
   area_m2  Float
   type     BuildingType 
   floors   Int
   address  String
   predio   Predio? @relation(fields: [predioId], references: [id])
-  predioId BigInt?
+  predioId Int?
 }
 
 model Terreno {
-  id             BigInt @id
+  id             Int @id
   area_m2        Float
   value          Int
   water          Boolean
   territory_type TerritoryType
   Buildings      Boolean
   Predio         Predio? @relation(fields: [predioId], references: [id])
-  predioId       BigInt?
+  predioId       Int?
 }
 
 model test{
