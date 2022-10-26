@@ -4,15 +4,17 @@ import { NextApiRequest, NextApiResponse } from "next";
 
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-    const predioId = req.query.id;
-    // console.log(req.body)
+    const propietarioId = req.query.id;
+    console.log(req.body)
 
     switch (req.method) {
+
+
         case 'DELETE':
-            deletePredio(res, predioId);
+            deletePropietario(res, propietarioId);
             break;
         case 'PUT':
-            putPredio(req, predioId);
+            putPropietario(req, propietarioId);
             break;
         default:
 
@@ -21,7 +23,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 }
 
 
-async function deletePredio(res: NextApiResponse, predioId: string | string[] | undefined) {
+async function deletePropietario(res: NextApiResponse, predioId: string | string[] | undefined) {
 
     const predio = await prisma.predio.delete({
         where: { id: Number(predioId) }
@@ -29,7 +31,7 @@ async function deletePredio(res: NextApiResponse, predioId: string | string[] | 
     res.json(predio)
 
 }
-async function putPredio(req: NextApiRequest, predioId: string | string[] | undefined) {
+async function putPropietario(req: NextApiRequest, predioId: string | string[] | undefined) {
 
     const { appraise, department, city } = req.body;
     try {

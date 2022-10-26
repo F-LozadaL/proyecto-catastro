@@ -6,7 +6,6 @@ import type { GetServerSideProps, NextPage } from 'next'
 import Router from "next/router";
 import { useRouter } from 'next/router';
 
-
 interface FormData {
     appraise: number,
     department: string,
@@ -19,13 +18,18 @@ interface Predios {
         department: string,
         city: string,
         appraise: number
+        _count: PrediosCount,
+        lands: boolean
     }[]
 }
+interface PrediosCount {
+    owner: number,
+    buildings: number
+}
 
-type LayoutType = Parameters<typeof Form>[0]['layout'];
 
-const Registro: NextPage<Predios> = ({ predios }) => {
 
+const Predio: NextPage<Predios> = ({ predios }) => {
 
 
     const router = useRouter();
@@ -64,6 +68,7 @@ const Registro: NextPage<Predios> = ({ predios }) => {
     }
 
     // ANT DESIGN STUFF
+    type LayoutType = Parameters<typeof Form>[0]['layout'];
     const [forma] = Form.useForm();
     const [formLayout, setFormLayout] = useState<LayoutType>('horizontal');
 
@@ -85,7 +90,6 @@ const Registro: NextPage<Predios> = ({ predios }) => {
         try {
             forma.resetFields();
             createPredio(data)
-            refreshData()
         } catch (error) {
             console.log(error)
         }
@@ -133,10 +137,15 @@ const Registro: NextPage<Predios> = ({ predios }) => {
                         {predios.map(p => (
                             <li key={p.id}>
                                 <div>
-                                    <h1>{p.department}</h1>
-                                    <p>{p.city}</p>
+                                    <span>{p.department}</span>
+                                    <span>{p.city}</span>
+                                    <span>{p._count.buildings}</span>
+                                    <span>{p._count.owner}</span>
                                     <Button htmlType="button" onClick={() => { deletePredio(p.id) }}>X</Button>
-                                    <Button htmlType="button" href={`/registros/edit/${p.id}`} >Edit</Button>
+                                    <Button htmlType="button" href={`/predio/${p.id}/edit`} >Edit</Button>
+                                    <Button htmlType="button" href={`/predio/edit/${p.id}`}>Editar Construcciones</Button>
+                                    <Button htmlType="button" href={`/predio/edit/${p.id}`}>Editar Terreno</Button>
+                                    <Button htmlType="button" href={`/predio/${p.id}/owners`}>Editar Dueños</Button>
                                     <Divider />
                                 </div>
                             </li>
@@ -149,11 +158,13 @@ const Registro: NextPage<Predios> = ({ predios }) => {
 }
 export const getServerSideProps: GetServerSideProps = async () => {
     const predios = await prisma.predio.findMany({
-        select: {
-            id: true,
-            department: true,
-            city: true,
-            appraise: true
+        include: {
+            _count: {
+                select: {
+                    owner: true,
+                    buildings: true
+                }
+            }
         }
     })
     return {
@@ -162,4 +173,4 @@ export const getServerSideProps: GetServerSideProps = async () => {
         }
     }
 }
-export default Registro;
+export default Predio;

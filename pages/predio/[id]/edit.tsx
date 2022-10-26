@@ -1,6 +1,8 @@
 import { Button, Divider, Form, Input } from "antd";
+import type { GetServerSideProps, GetServerSidePropsContext, NextPage } from "next";
 import Router, { useRouter } from "next/router";
 import PageLayout from "../../../components/PageLayout";
+import { prisma } from "../../../lib/prisma";
 
 interface FormData {
     appraise: number,
@@ -8,7 +10,21 @@ interface FormData {
     city: string
 }
 
-const Editar = () => {
+interface Predio {
+    predio: {
+        id: number,
+        department: string,
+        city: string,
+        appraise: number
+        _count: PrediosCount,
+        lands: boolean
+    }
+}
+interface PrediosCount {
+    owner: number,
+    buildings: number
+}
+const Editar: NextPage<Predio> = ({ predio }) => {
 
     const router = useRouter();
     const { id } = router.query
@@ -17,7 +33,7 @@ const Editar = () => {
     const refreshData = () => {
         router.replace(router.asPath);
     }
-
+    // console.log(predio)
     const [form] = Form.useForm();
 
     const formItemLayout = {
@@ -58,6 +74,7 @@ const Editar = () => {
     const onReset = () => {
         form.resetFields();
     };
+    console.log(predio.city)
     return (
 
         <PageLayout>
@@ -67,13 +84,13 @@ const Editar = () => {
                 name="edit-predio"
                 onFinish={onFinish}>
                 <Form.Item label='Departamento' name='department' rules={[{ required: true }]}>
-                    <Input />
+                    <Input placeholder={predio.department} />
                 </Form.Item>
                 <Form.Item label='Ciudad' name='city' rules={[{ required: true }]}>
-                    <Input />
+                    <Input placeholder={predio.city} />
                 </Form.Item>
                 <Form.Item label='Avaluo' name='appraise' rules={[{ required: true }]}>
-                    <Input />
+                    <Input placeholder={String(predio.appraise)} />
                 </Form.Item>
                 <Form.Item {...tailLayout}>
                     <Button type="primary" htmlType="submit">
@@ -88,6 +105,34 @@ const Editar = () => {
 
         </PageLayout>
     )
+}
+
+export const getServerSideProps: GetServerSideProps = async (ctx: GetServerSidePropsContext) => {
+    let predioId;
+    if (ctx.params != undefined) {
+        predioId = Number(ctx.params.id)
+    } else {
+        predioId = 0;
+    }
+
+    const predio = await prisma.predio.findFirst({
+        where: {
+            id: predioId
+        },
+        include: {
+            _count: {
+                select: {
+                    owner: true,
+                    buildings: true
+                }
+            }
+        }
+    })
+    return {
+        props: {
+            predio
+        }
+    }
 }
 
 

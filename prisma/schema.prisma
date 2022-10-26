@@ -18,12 +18,12 @@ model Predio {
   city       String
   owner      Propietario[]
   buildings  Construccion[]
-  lands      Terreno[]
+  lands      Terreno?
   @@index([appraise])
 }
 
 model Propietario {
-  id            Int       @id
+  id            Int       @id 
   id_type       DocumentType
   names         String
   lastnames     String
@@ -53,8 +53,8 @@ model Terreno {
   water          Boolean
   territory_type TerritoryType
   Buildings      Boolean
-  Predio         Predio? @relation(fields: [predioId], references: [id])
-  predioId       Int?
+  Predio         Predio @relation(fields: [predioId], references: [id])
+  predioId       Int @unique
 }
 
 model test{

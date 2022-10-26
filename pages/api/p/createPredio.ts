@@ -1,9 +1,8 @@
-import { prisma } from "../../lib/prisma";
+import { prisma } from "../../../lib/prisma";
 import { NextApiRequest, NextApiResponse } from "next";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     const { appraise, department, city } = req.body;
-    console.log(req.body)
     try {
         await prisma.predio.create({
             data: {
