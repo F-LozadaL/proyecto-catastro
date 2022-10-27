@@ -1,4 +1,4 @@
-import { Button, Divider, Form, Input } from "antd";
+import { Button, Divider, Form, Input, Select } from "antd";
 import Item from "antd/lib/list/Item";
 import type { GetServerSideProps, GetServerSidePropsContext, NextPage } from "next";
 import { useRouter } from "next/router";
@@ -7,34 +7,27 @@ import PageLayout from "../../../components/PageLayout";
 
 import { prisma } from "../../../lib/prisma";
 
+const { Option } = Select;
 
-interface Owner {
-    owners: {
+interface Building {
+    buildings: {
         id: number,
-        id_type: string,
-        names: string,
-        lastnames: string,
-        address: string,
-        phone: string,
-        person_type: string,
-        NIT: number,
-        business_name: string,
-        email: string,
+        area_m2: number,
+        type: string,
+        floors: number,
+        address: string
     }[]
 }
 
-
-
 interface FormData {
-    id: number,
-    ownerId: number
+    predioId: number,
+    buildingId: number
 }
-
 
 
 // ANT DESIGN STUFF -END
 
-const Predio: NextPage<Owner> = ({ owners }) => {
+const Predio: NextPage<Building> = ({ buildings }) => {
 
     const router = useRouter();
     // Call this function whenever you want to
@@ -61,29 +54,30 @@ const Predio: NextPage<Owner> = ({ owners }) => {
         wrapperCol: { offset: 8, span: 16 },
     };
 
-    async function connectOwner(data: FormData) {
+
+
+    async function addConstruccion(data: FormData) {
         try {
-            await fetch(`http://localhost:3000/api/p/connectOwner`,
-                {
-                    body: JSON.stringify(data),
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    method: 'PUT'
-                })
+            await fetch('http://localhost:3000/api/p/addBuilding', {
+                body: JSON.stringify(data),
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                method: 'POST'
+            })
             refreshData()
         } catch (error) {
-            console.log(error)
+            console.log(error);
         }
     }
 
-    async function disconnectOwner(ownerId: number) {
+    async function removeBuilding(buildingId: number) {
         const body = {
-            id: Number(id),
-            ownerId: ownerId
+            predioId: Number(id),
+            buildingId: buildingId
         }
         try {
-            await fetch(`http://localhost:3000/api/p/disconnectOwner`, {
+            await fetch(`http://localhost:3000/api/p/removeBuilding`, {
                 body: JSON.stringify(body),
                 headers: {
                     'Content-Type': 'application/json'
@@ -96,12 +90,18 @@ const Predio: NextPage<Owner> = ({ owners }) => {
         }
     }
 
+
+
+
+
     const onFinish = async (data: FormData) => {
-        data.id = Number(id);
-        data.ownerId = Number(data.ownerId)
+
+        data.predioId = Number(id);
+        data.buildingId = Number(data.buildingId)
         try {
             form.resetFields();
-            connectOwner(data)
+            addConstruccion(data)
+            // refreshData()
         } catch (error) {
             console.log(error)
         }
@@ -111,16 +111,18 @@ const Predio: NextPage<Owner> = ({ owners }) => {
     };
 
 
+
     return (
         <PageLayout>
+
             <Form
                 {...formItemLayout}
                 form={form}
-                name="connect-owner"
+                name="add-building"
                 initialValues={{ id: id }}
                 onFinish={onFinish}
             >
-                <Form.Item label='ID Propietario' name='ownerId' rules={[{ required: true }]}>
+                <Form.Item label='ID Construccion' name='buildingId' rules={[{ required: true }]}>
                     <Input />
                 </Form.Item>
                 <Form.Item>
@@ -131,18 +133,21 @@ const Predio: NextPage<Owner> = ({ owners }) => {
             </Form>
             <Divider />
 
+            <Divider />
+
 
             <div>
                 <ul>
-                    {owners.map(o => (
-                        <div key={o.id}>
+                    {buildings.map(b => (
+                        <div key={b.id}>
                             <li >
-                                <span>{o.id}</span>
-                                <span>{o.id_type}</span>
-                                <span>{o.person_type}</span>
-                                <span>{o.names}</span>
-                                <Button htmlType="button" onClick={() => { disconnectOwner(o.id) }}>X</Button>
-                                <Button htmlType="button" href={`/owner/${o.id}/edit`}>Editar</Button>
+                                <span>{b.id}</span>
+                                <span>{b.type}</span>
+                                <span>{b.area_m2}</span>
+                                <span>{b.floors}</span>
+                                <Button htmlType="button" onClick={() => { removeBuilding(b.id) }}>X</Button>
+                                <Button htmlType="button" href={`/building/${b.id}/edit`}>Editar</Button>
+
                             </li>
                             <Divider />
                         </div>
@@ -162,19 +167,18 @@ export const getServerSideProps: GetServerSideProps = async (ctx: GetServerSideP
         predioId = 0;
     }
 
-    const ownera = await prisma.predio.findUnique({
+    const buildingsa = await prisma.predio.findUnique({
         where: {
             id: predioId
         },
         select: {
-            owner: true,
-
+            buildings: true
         }
     })
-    const owners = ownera?.owner
+    const buildings = buildingsa?.buildings
     return {
         props: {
-            owners
+            buildings
         }
     }
 }

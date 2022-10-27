@@ -143,7 +143,7 @@ const Predio: NextPage<Predios> = ({ predios }) => {
                                     <span>{p._count.owner}</span>
                                     <Button htmlType="button" onClick={() => { deletePredio(p.id) }}>X</Button>
                                     <Button htmlType="button" href={`/predio/${p.id}/edit`} >Edit</Button>
-                                    <Button htmlType="button" href={`/predio/edit/${p.id}`}>Editar Construcciones</Button>
+                                    <Button htmlType="button" href={`/predio/${p.id}/buildings`}>Editar Construcciones</Button>
                                     <Button htmlType="button" href={`/predio/edit/${p.id}`}>Editar Terreno</Button>
                                     <Button htmlType="button" href={`/predio/${p.id}/owners`}>Editar Dueños</Button>
                                     <Divider />

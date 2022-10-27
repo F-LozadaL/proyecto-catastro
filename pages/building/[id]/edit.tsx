@@ -1,14 +1,13 @@
-
 import { Button, Divider, Form, Input, Select } from "antd";
 import type { GetServerSideProps, GetServerSidePropsContext, NextPage } from "next";
-import { useRouter } from "next/router";
+import Router, { useRouter } from "next/router";
 import { useState } from "react";
-import PageLayout from "../../components/PageLayout";
-import { prisma } from "../../lib/prisma";
+import PageLayout from "../../../components/PageLayout";
+import { prisma } from "../../../lib/prisma";
 
 const { Option } = Select;
 
-interface FormData {
+interface Owner {
     id: number,
     id_type: string,
     names: string,
@@ -21,54 +20,61 @@ interface FormData {
     email: string
 }
 
-interface Owners {
-    owners: {
-        id: number,
-        id_type: string,
-        names: string,
-        lastnames: string,
-        address: string,
-        phone: string,
-        person_type: string,
-        NIT: number,
-        business_name: string,
-        email: string
-    }[]
-}
 
-
-
-const Owner: NextPage<Owners> = ({ owners }) => {
+const Editar: NextPage<Owner> = (owner) => {
 
     const router = useRouter();
+    const { id } = router.query
     // Call this function whenever you want to
     // refresh props!
     const refreshData = () => {
         router.replace(router.asPath);
     }
+    const [form] = Form.useForm();
 
-    async function createPropietario(data: FormData) {
+
+    async function updateOwner(data: Owner) {
+
         try {
-            await fetch('http://localhost:3000/api/o/createOwner', {
+            await fetch(`http://localhost:3000/api/o/${id}`, {
                 body: JSON.stringify(data),
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                method: 'POST'
+                method: 'PUT'
             })
-            refreshData()
         } catch (error) {
-            console.log(error);
+
         }
+
     }
 
 
+    const onFinish = async (data: Owner) => {
+
+        if (data.person_type == 'NATURAL') {
+            data.NIT = undefined
+            data.business_name = undefined
+        }
+        data.id = Number(data.id)
+
+        try {
+            updateOwner(data)
+            form.resetFields();
+        } catch (error) {
+            console.log(error)
+        }
+    };
+
+    const onReset = () => {
+        form.resetFields();
+    };
     // ANT DESIGN STUFF
     type LayoutType = Parameters<typeof Form>[0]['layout'];
     const [forma] = Form.useForm();
     const [formLayout, setFormLayout] = useState<LayoutType>('horizontal');
 
-    const [naturalHidden, setNaturalHidden] = useState<boolean>(true);
+    const [naturalFlag, setNaturalFlag] = useState<boolean>(true);
 
     const formItemLayout =
         formLayout === 'horizontal'
@@ -82,58 +88,26 @@ const Owner: NextPage<Owners> = ({ owners }) => {
         wrapperCol: { offset: 8, span: 16 },
     };
 
-    const onFinish = async (data: FormData) => {
-
-        if (data.person_type == 'NATURAL') {
-            data.NIT = undefined
-            data.business_name = undefined
-        }
-        data.id = Number(data.id)
-
-        try {
-            forma.resetFields();
-            createPropietario(data)
-            // refreshData()
-        } catch (error) {
-            console.log(error)
-        }
-    };
-    const onReset = () => {
-        forma.resetFields();
-    };
-
     // ANT DESIGN STUFF -END
     const onDocumentTypeChange = (value: string) => {
         console.log(value)
         if (value == 'NATURAL') {
-            setNaturalHidden(true)
+            setNaturalFlag(true)
         } else {
-            setNaturalHidden(false)
+            setNaturalFlag(false)
         }
     };
-    console.log(owners)
-
     return (
+
         <PageLayout>
             <Form
                 {...formItemLayout}
-                form={forma}
-                name="create-predio"
+                form={form}
+                name="edit-owner"
                 onFinish={onFinish}
                 initialValues={{
-                    id: 123,
-                    id_type: "CEDULA_DE_CIUDADANIA",
-                    names: "jaun",
-                    lastnames: "papa",
-                    address: "cra 55 4d#3",
-                    phone: "4445 444",
-                    person_type: "NATURAL",
-                    NIT: "e123",
-                    business_name: "emperesita SA",
-                    email: "emperesitadSA@gmail.com"
-                }}
-            >
-
+                    person_type: "NATURAL"
+                }}>
                 <Form.Item label='Tipo de Documento' name='id_type' rules={[{ required: true }]}>
                     <Select
                         placeholder="Select a option and change input text above"
@@ -172,10 +146,10 @@ const Owner: NextPage<Owners> = ({ owners }) => {
                         <Option value="JURIDICA">JURIDICA</Option>
                     </Select>
                 </Form.Item>
-                <Form.Item label='NIT' name='NIT' hidden={naturalHidden} >
+                <Form.Item label='NIT' name='NIT' hidden={naturalFlag} >
                     <Input />
                 </Form.Item>
-                <Form.Item label='Razon Social' hidden={naturalHidden} name='business_name'>
+                <Form.Item label='Razon Social' hidden={naturalFlag} name='business_name'>
                     <Input />
                 </Form.Item>
                 <Form.Item label='E-Mail' name='email' rules={[{ required: true }]}>
@@ -190,31 +164,32 @@ const Owner: NextPage<Owners> = ({ owners }) => {
                     </Button>
                 </Form.Item>
             </Form>
+            <Divider />
+
         </PageLayout>
     )
-
 }
 
 export const getServerSideProps: GetServerSideProps = async (ctx: GetServerSidePropsContext) => {
-    let predioId;
+    let ownerId;
     if (ctx.params != undefined) {
-        predioId = Number(ctx.params.id)
+        ownerId = Number(ctx.params.id)
     } else {
-        predioId = 0;
+        ownerId = 0;
     }
 
-    const owners = await prisma.propietario.findMany({
+    const owner = await prisma.propietario.findUnique({
         where: {
-            id: predioId
+            id: ownerId
         }
     })
-
     return {
         props: {
-            owners
+            owner
         }
     }
 }
-export default Owner;
 
+
+export default Editar;
 

@@ -37,7 +37,7 @@ model Propietario {
 }
 
 model Construccion {
-  id       Int  @id
+  id       Int  @id @default(autoincrement())
   area_m2  Float
   type     BuildingType 
   floors   Int
@@ -47,7 +47,7 @@ model Construccion {
 }
 
 model Terreno {
-  id             Int @id
+  id             Int @id @default(autoincrement())
   area_m2        Float
   value          Int
   water          Boolean

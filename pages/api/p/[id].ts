@@ -33,14 +33,14 @@ async function putPredio(req: NextApiRequest, predioId: string | string[] | unde
 
     const { appraise, department, city } = req.body;
     try {
-        const predio = await prisma.predio.update({
+        await prisma.predio.update({
             where: {
                 id: Number(predioId)
             },
             data: {
-                appraise: req.body.appraise,
-                department: req.body.department,
-                city: req.body.city
+                appraise: appraise,
+                department: department,
+                city: city
             }
         })
     } catch (error) {
