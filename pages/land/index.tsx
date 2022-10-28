@@ -120,6 +120,7 @@ const Land: NextPage<Land> = ({ lands }) => {
     return (
 
         <PageLayout>
+            <h1 >Crear Terreno</h1>
             <Form
                 {...formItemLayout}
                 form={form}

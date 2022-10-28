@@ -132,6 +132,7 @@ const Owner: NextPage<Owners> = ({ owners }) => {
 
     return (
         <PageLayout>
+            <h1 >Crear Propietario</h1>
             <Form
                 {...formItemLayout}
                 form={forma}

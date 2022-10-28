@@ -117,6 +117,7 @@ const Building: NextPage<Building> = ({ buildings }) => {
     return (
 
         <PageLayout>
+            <h1 >Crear Construccion</h1>
             <Form
                 {...formItemLayout}
                 form={form}
