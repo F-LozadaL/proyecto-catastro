@@ -3,8 +3,11 @@ import React, { useEffect, useState } from 'react'
 import PageLayout from "../../components/PageLayout";
 import { prisma } from "../../lib/prisma";
 import type { GetServerSideProps, NextPage } from 'next'
-import Router from "next/router";
 import { useRouter } from 'next/router';
+import { Space, Table, Tag } from 'antd';
+import Link from "next/link";
+
+const { Column, ColumnGroup } = Table;
 
 interface FormData {
     appraise: number,
@@ -25,6 +28,17 @@ interface Predios {
 interface PrediosCount {
     owner: number,
     buildings: number
+}
+
+interface DataRow {
+
+    id: number,
+    department: string,
+    city: string,
+    appraise: number
+    _count: PrediosCount,
+    lands: boolean
+
 }
 
 
@@ -104,8 +118,6 @@ const Predio: NextPage<Predios> = ({ predios }) => {
             <div>
                 <h1 >Crear Predio</h1>
 
-
-                {/* ANT DESIGN FORM */}
                 <Form
                     {...formItemLayout}
                     form={forma}
@@ -130,28 +142,39 @@ const Predio: NextPage<Predios> = ({ predios }) => {
                         </Button>
                     </Form.Item>
                 </Form>
-                {/* ANT DESIGN FORM - END*/}
+                <Divider />
+                <Table dataSource={predios} rowKey="id">
 
-                <div>
-                    <ul>
-                        {predios.map(p => (
-                            <li key={p.id}>
-                                <div>
-                                    <span>{p.department}</span>
-                                    <span>{p.city}</span>
-                                    <span>{p._count.buildings}</span>
-                                    <span>{p._count.owner}</span>
-                                    <Button htmlType="button" onClick={() => { deletePredio(p.id) }}>X</Button>
-                                    <Button htmlType="button" href={`/predio/${p.id}/edit`} >Edit</Button>
-                                    <Button htmlType="button" href={`/predio/${p.id}/buildings`}>Editar Construcciones</Button>
-                                    <Button htmlType="button" href={`/predio/edit/${p.id}`}>Editar Terreno</Button>
-                                    <Button htmlType="button" href={`/predio/${p.id}/owners`}>Editar Dueños</Button>
-                                    <Divider />
-                                </div>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
+                    <Column title="Departamento" dataIndex="department" key="department" />
+                    <Column title="Ciudad" dataIndex="city" key="city" />
+                    <Column title="Avaluo" dataIndex="appraise" key="appraise" />
+                    <Column title="Numero de Propietarios" key="address"
+                        render={(_: any, record: DataRow) => (
+                            <Space>
+                                <p>{record._count.owner}</p>
+                            </Space>)}
+                    />
+                    <Column title="Numero de Construcciones" key="buidlings"
+                        render={(_: any, record: DataRow) => (
+                            <Space>
+                                <p>{record._count.buildings}</p>
+                            </Space>)}
+                    />
+                    <Column
+                        title="Action"
+                        key="action"
+                        render={(_: any, record: DataRow) => (
+                            <Space size="middle">
+
+                                <Link href={`/predio/${record.id}/edit`}>Editar</Link>
+                                <Button htmlType="button" onClick={() => { deletePredio(record.id) }}>Delete</Button>
+                                <Button htmlType="button" href={`/predio/${record.id}/buildings`}>Construcciones</Button>
+                                <Button htmlType="button" href={`/predio/${record.id}/land`}>Terreno</Button>
+                                <Button htmlType="button" href={`/predio/${record.id}/owners`}>Propietarios</Button>
+                            </Space>
+                        )}
+                    />
+                </Table>
             </div>
         </PageLayout>
     )

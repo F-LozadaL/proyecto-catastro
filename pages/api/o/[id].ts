@@ -12,9 +12,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
         case 'DELETE':
             deletePropietario(res, propietarioId);
+            res.status(200).json({ message: 'Propietario Borrado' })
             break;
         case 'PUT':
             putPropietario(req, propietarioId);
+            res.status(200).json({ message: 'Propietario Actualizado' })
             break;
         default:
 
@@ -34,7 +36,7 @@ async function deletePropietario(res: NextApiResponse, ownerId: string | string[
 async function putPropietario(req: NextApiRequest, ownerId: string | string[] | undefined) {
 
     const { id, id_type, names, lastnames, address, phone, person_type, NIT, business_name, email } = req.body;
-
+    // console.log(NIT)
     try {
         await prisma.propietario.update({
             where: {
@@ -48,13 +50,15 @@ async function putPropietario(req: NextApiRequest, ownerId: string | string[] | 
                 address: address,
                 phone: phone,
                 person_type: person_type,
-                NIT: NIT,
-                business_name: business_name,
+                NIT: NIT != null ? NIT : null,
+                business_name: business_name != null ? business_name : null,
                 email: email
             }
         })
+
     } catch (error) {
         console.error(error)
     }
+
 
 }

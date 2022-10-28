@@ -8,31 +8,32 @@ import { prisma } from "../../../lib/prisma";
 
 const { Option } = Select;
 
-interface Building {
-    building: {
+interface Land {
+    land: {
         id: number,
         area_m2: number,
-        type: string,
-        floors: number,
-        address: string
+        value: number,
+        water: boolean,
+        territory_type: string,
+        Buildings: boolean
     }
 }
 interface FormData {
 
     id: number,
     area_m2: number,
-    type: string,
-    floors: number,
-    address: string
+    value: number,
+    water: boolean,
+    territory_type: string
 
 }
 
-const Editar: NextPage<Building> = (bui) => {
+const Editar: NextPage<Land> = (bui) => {
 
     const router = useRouter();
     const { id } = router.query
-    const building = bui.building
-
+    const land = bui.land
+    console.log(land)
     // Call this function whenever you want to
     // refresh props!
     const refreshData = () => {
@@ -41,10 +42,10 @@ const Editar: NextPage<Building> = (bui) => {
     const [form] = Form.useForm();
 
 
-    async function updateBuilding(data: FormData) {
+    async function updateLand(data: FormData) {
 
         try {
-            await fetch(`http://localhost:3000/api/b/${id}`, {
+            await fetch(`http://localhost:3000/api/l/${id}`, {
                 body: JSON.stringify(data),
                 headers: {
                     'Content-Type': 'application/json'
@@ -60,10 +61,8 @@ const Editar: NextPage<Building> = (bui) => {
     const onFinish = async (data: FormData) => {
         data.id = Number(id)
         data.area_m2 = Number(data.area_m2)
-        data.floors = Number(data.floors)
         try {
-            form.resetFields();
-            updateBuilding(data)
+            updateLand(data)
         } catch (error) {
             console.log(error)
         }
@@ -90,7 +89,7 @@ const Editar: NextPage<Building> = (bui) => {
     };
 
     // ANT DESIGN STUFF -END
-    console.log(building)
+    // console.log(building)
     return (
 
         <PageLayout>
@@ -99,35 +98,52 @@ const Editar: NextPage<Building> = (bui) => {
                 form={form}
                 name="create-predio"
                 onFinish={onFinish}
+
                 initialValues={{
-                    area_m2: building.area_m2,
-                    type: building.type,
-                    floors: building.floors,
-                    address: building.address
+                    area_m2: land.area_m2,
+                    value: land.value,
+                    water: land.water,
+                    territory_type: land.territory_type,
+                    Buildings: land.Buildings
                 }}
             >
                 <Form.Item label='Area (m²)' name='area_m2' rules={[{ required: true }]} >
                     <Input />
                 </Form.Item>
-                <Form.Item label='Tipo de Construccion' name='type' rules={[{ required: true }]}>
+                <Form.Item label='Tipo de Terreno' name='territory_type' rules={[{ required: true }]}>
                     <Select
-                        placeholder="Seleccione el Tipo de Construccion"
+                        placeholder="Seleccione el Tipo de Terreno"
                         // onChange={onGenderChange}
                         allowClear
                     >
-                        <Option value="INDUSTRIAL">Industrial</Option>
-                        <Option value="COMERCIAL">Comercial</Option>
-                        <Option value="RESIDENCIAL">Residencial</Option>
+                        <Option value="URBANO">Urbano</Option>
+                        <Option value="RURAL">Rural</Option>
                     </Select>
                 </Form.Item>
 
-                <Form.Item label='Numero de Pisos' name='floors' rules={[{ required: true }]}>
+                <Form.Item label='Valor' name='value' rules={[{ required: true }]}>
                     <Input />
                 </Form.Item>
-                <Form.Item label='Direccion' name='address' rules={[{ required: true }]}>
-                    <Input />
+                <Form.Item label='Fuentes de Agua' name='water' rules={[{ required: true }]}>
+                    <Select
+                        placeholder="Esta cerca a fuentes de Agua?"
+                        // onChange={onGenderChange}
+                        allowClear
+                    >
+                        <Option value={true} >Si</Option>
+                        <Option value={false}>No</Option>
+                    </Select>
                 </Form.Item>
-
+                <Form.Item label='Construcciones' name='Buildings' rules={[{ required: true }]}>
+                    <Select
+                        placeholder="Tiene Construcciones?"
+                        // onChange={onGenderChange}
+                        allowClear
+                    >
+                        <Option value={true} >Si</Option>
+                        <Option value={false}>No</Option>
+                    </Select>
+                </Form.Item>
                 <Form.Item {...tailLayout}>
                     <Button type="primary" htmlType="submit">
                         Submit
@@ -144,22 +160,22 @@ const Editar: NextPage<Building> = (bui) => {
 }
 
 export const getServerSideProps: GetServerSideProps = async (ctx: GetServerSidePropsContext) => {
-    let buildingId;
+    let landId;
     if (ctx.params != undefined) {
-        buildingId = Number(ctx.params.id)
+        landId = Number(ctx.params.id)
     } else {
-        buildingId = 0;
+        landId = 0;
     }
 
-    const building = await prisma.construccion.findUnique({
+    const land = await prisma.terreno.findUnique({
         where: {
-            id: buildingId
+            id: landId
         }
     })
-    console.log("props", building)
+
     return {
         props: {
-            building
+            land
         }
     }
 }

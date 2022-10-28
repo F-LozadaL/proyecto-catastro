@@ -15,33 +15,36 @@ const { Column, ColumnGroup } = Table;
 
 const { Option } = Select;
 
-interface Building {
-    buildings: {
+interface Land {
+    lands: {
         id: number,
         area_m2: number,
-        type: string,
-        floors: number,
-        address: string
+        value: number,
+        water: boolean,
+        territory_type: string,
+        Buildings: boolean
     }[]
 }
 
 interface FormData {
     area_m2: number,
-    type: string,
-    floors: number,
-    address: string
+    value: number,
+    water: boolean,
+    territory_type: string,
+    Buildings: boolean
 }
 
 interface DataRow {
     id: number,
     area_m2: number,
-    type: string,
-    floors: number,
-    address: string
+    value: number,
+    water: boolean,
+    territory_type: string,
+    Buildings: boolean
 }
 
 
-const Building: NextPage<Building> = ({ buildings }) => {
+const Land: NextPage<Land> = ({ lands }) => {
 
     const router = useRouter();
     // Call this function whenever you want to
@@ -70,9 +73,9 @@ const Building: NextPage<Building> = ({ buildings }) => {
 
 
 
-    async function createConstruccion(data: FormData) {
+    async function createTerreno(data: FormData) {
         try {
-            await fetch('http://localhost:3000/api/b/createBuilding', {
+            await fetch('http://localhost:3000/api/l/createLand', {
                 body: JSON.stringify(data),
                 headers: {
                     'Content-Type': 'application/json'
@@ -85,9 +88,9 @@ const Building: NextPage<Building> = ({ buildings }) => {
         }
     }
 
-    async function deleteBuilding(buildingid: Number) {
+    async function deleteLand(landId: Number) {
         try {
-            await fetch(`http://localhost:3000/api/b/${buildingid}`, {
+            await fetch(`http://localhost:3000/api/b/${landId}`, {
                 headers: {
                     'Content-Type': 'application/json'
                 },
@@ -101,10 +104,10 @@ const Building: NextPage<Building> = ({ buildings }) => {
 
     const onFinish = async (data: FormData) => {
         data.area_m2 = Number(data.area_m2)
-        data.floors = Number(data.floors)
+        data.value = Number(data.value)
         try {
             form.resetFields();
-            createConstruccion(data)
+            createTerreno(data)
             // refreshData()
         } catch (error) {
             console.log(error)
@@ -120,7 +123,7 @@ const Building: NextPage<Building> = ({ buildings }) => {
             <Form
                 {...formItemLayout}
                 form={form}
-                name="create-predio"
+                name="create-terreno"
                 onFinish={onFinish}
             // initialValues={{
 
@@ -129,23 +132,39 @@ const Building: NextPage<Building> = ({ buildings }) => {
                 <Form.Item label='Area (m²)' name='area_m2' rules={[{ required: true }]} >
                     <Input />
                 </Form.Item>
-                <Form.Item label='Tipo de Construccion' name='type' rules={[{ required: true }]}>
+                <Form.Item label='Tipo de Terreno' name='territory_type' rules={[{ required: true }]}>
                     <Select
-                        placeholder="Seleccione el Tipo de Construccion"
+                        placeholder="Seleccione el Tipo de Terreno"
                         // onChange={onGenderChange}
                         allowClear
                     >
-                        <Option value="INDUSTRIAL">Industrial</Option>
-                        <Option value="COMERCIAL">Comercial</Option>
-                        <Option value="RESIDENCIAL">Residencial</Option>
+                        <Option value="URBANO">Urbano</Option>
+                        <Option value="RURAL">Rural</Option>
                     </Select>
                 </Form.Item>
 
-                <Form.Item label='Numero de Pisos' name='floors' rules={[{ required: true }]}>
+                <Form.Item label='Valor' name='value' rules={[{ required: true }]}>
                     <Input />
                 </Form.Item>
-                <Form.Item label='Direccion' name='address' rules={[{ required: true }]}>
-                    <Input />
+                <Form.Item label='Fuentes de Agua' name='water' rules={[{ required: true }]}>
+                    <Select
+                        placeholder="Esta cerca a fuentes de Agua?"
+                        // onChange={onGenderChange}
+                        allowClear
+                    >
+                        <Option value={true} >Si</Option>
+                        <Option value={false}>No</Option>
+                    </Select>
+                </Form.Item>
+                <Form.Item label='Construcciones' name='Buildings' rules={[{ required: true }]}>
+                    <Select
+                        placeholder="Tiene Construcciones?"
+                        // onChange={onGenderChange}
+                        allowClear
+                    >
+                        <Option value={true} >Si</Option>
+                        <Option value={false}>No</Option>
+                    </Select>
                 </Form.Item>
 
                 <Form.Item {...tailLayout}>
@@ -160,25 +179,37 @@ const Building: NextPage<Building> = ({ buildings }) => {
             <Divider />
 
 
-            <Table dataSource={buildings} rowKey="id">
-
+            <Table dataSource={lands} rowKey="id">
+                area_m2: number,
+                value: number,
+                water: boolean,
+                territory_type: string,
+                Buildings: boolean
                 <Column title="Area (m²)" dataIndex="area_m2" key="area_m2" />
-                <Column title="Tipo de Construccion" dataIndex="type" key="type" />
-
-                <Column title="Numero de Pisos" dataIndex="floors" key="floors" />
-                <Column title="Direccion" dataIndex="address" key="address" />
-
+                <Column title="Valor" dataIndex="value" key="value" />
+                <Column title="Tipo de Terreno" dataIndex="territory_type" key="territory_type" />
+                <Column title="Fuentes de Agua" key="water"
+                    render={(_: any, record: DataRow) => (
+                        <Space>
+                            <p>{String(record.water)}</p>
+                        </Space>)} />
+                <Column title="Construcciones" key="Buildings"
+                    render={(_: any, record: DataRow) => (
+                        <Space>
+                            <p>{String(record.Buildings)}</p>
+                        </Space>)} />
                 <Column
                     title="Action"
                     key="action"
                     render={(_: any, record: DataRow) => (
 
                         <Space size="middle">
-                            <Button onClick={() => { deleteBuilding(record.id) }} type="link">Delete</Button>
-
+                            {/* <Button onClick={() => { deleteBuilding(record.id) }} type="link">Delete</Button> */}
+                            <Link href={`/land/${record.id}/edit`}>Editar</Link>
                         </Space>
                     )}
                 />
+
             </Table>
 
         </PageLayout>
@@ -187,18 +218,18 @@ const Building: NextPage<Building> = ({ buildings }) => {
 
 export const getServerSideProps: GetServerSideProps = async () => {
 
-    const buildings = await prisma.construccion.findMany({
+    const lands = await prisma.terreno.findMany({
 
     })
     return {
         props: {
-            buildings
+            lands
         }
     }
 }
 
 
-export default Building;
+export default Land;
 
 
 

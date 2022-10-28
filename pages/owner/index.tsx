@@ -5,6 +5,10 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import PageLayout from "../../components/PageLayout";
 import { prisma } from "../../lib/prisma";
+import { Space, Table, Tag } from 'antd';
+import Link from "next/link";
+
+const { Column, ColumnGroup } = Table;
 
 const { Option } = Select;
 
@@ -62,6 +66,19 @@ const Owner: NextPage<Owners> = ({ owners }) => {
         }
     }
 
+    async function deleteOwner(ownerid: Number) {
+        try {
+            await fetch(`http://localhost:3000/api/o/${ownerid}`, {
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                method: 'DELETE'
+            })
+            refreshData()
+        } catch (error) {
+            console.log(error)
+        }
+    }
 
     // ANT DESIGN STUFF
     type LayoutType = Parameters<typeof Form>[0]['layout'];
@@ -120,18 +137,6 @@ const Owner: NextPage<Owners> = ({ owners }) => {
                 form={forma}
                 name="create-predio"
                 onFinish={onFinish}
-                initialValues={{
-                    id: 123,
-                    id_type: "CEDULA_DE_CIUDADANIA",
-                    names: "jaun",
-                    lastnames: "papa",
-                    address: "cra 55 4d#3",
-                    phone: "4445 444",
-                    person_type: "NATURAL",
-                    NIT: "e123",
-                    business_name: "emperesita SA",
-                    email: "emperesitadSA@gmail.com"
-                }}
             >
 
                 <Form.Item label='Tipo de Documento' name='id_type' rules={[{ required: true }]}>
@@ -190,23 +195,40 @@ const Owner: NextPage<Owners> = ({ owners }) => {
                     </Button>
                 </Form.Item>
             </Form>
+            <Divider />
+
+            <Table dataSource={owners} rowKey="id">
+
+                <Column title="Documento" dataIndex="id_type" key="id_type" />
+                <Column title="ID" dataIndex="id" key="id" />
+                <Column title="Nombres" dataIndex="names" key="names" />
+                <Column title="Apellidos" dataIndex="lastnames" key="lastnames" />
+                <Column title="Direccion" dataIndex="address" key="address" />
+                <Column title="Tel." dataIndex="phone" key="phone" />
+                <Column title="E-Mail" dataIndex="email" key="email" />
+                <Column title="Persona..." dataIndex="person_type" key="person_type" />
+                <Column title="NIT" dataIndex="NIT" key="NIT" />
+                <Column title="Razon Social" dataIndex="business_name" key="business_name" />
+                <Column
+                    title="Action"
+                    key="action"
+                    render={(_: any, record: FormData) => (
+                        <Space size="middle">
+                            <Button htmlType="button" onClick={() => { deleteOwner(record.id) }}>DELETE</Button>
+                            <Link href={`/owner/${record.id}/edit`}>Editar</Link>
+                        </Space>
+                    )}
+                />
+            </Table>
         </PageLayout>
     )
 
 }
 
 export const getServerSideProps: GetServerSideProps = async (ctx: GetServerSidePropsContext) => {
-    let predioId;
-    if (ctx.params != undefined) {
-        predioId = Number(ctx.params.id)
-    } else {
-        predioId = 0;
-    }
 
     const owners = await prisma.propietario.findMany({
-        where: {
-            id: predioId
-        }
+
     })
 
     return {

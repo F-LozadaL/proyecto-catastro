@@ -18,7 +18,7 @@ model Predio {
   city       String
   owner      Propietario[]
   buildings  Construccion[]
-  lands      Terreno?
+  land      Terreno?
   @@index([appraise])
 }
 
@@ -30,7 +30,7 @@ model Propietario {
   address       String
   phone         String       @unique
   person_type   PersonType
-  NIT           BigInt      ?
+  NIT           Int      ?
   business_name String      ?
   email         String      ? @unique
   terriory      Predio      []
@@ -53,8 +53,8 @@ model Terreno {
   water          Boolean
   territory_type TerritoryType
   Buildings      Boolean
-  Predio         Predio @relation(fields: [predioId], references: [id])
-  predioId       Int @unique
+  Predio         Predio? @relation(fields: [predioId], references: [id])
+  predioId       Int? @unique
 }
 
 model test{

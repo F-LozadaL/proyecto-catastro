@@ -10,13 +10,11 @@ export default function PageLayout({ children, title = 'Catastro - App' }) {
                 <link rel="icon" href="/favicon.ico" />
             </Head>
             <header>
-
-                <div><Link href="/predio">Registros</Link></div>
                 <div><Link href="/">Home</Link></div>
-                <div><Link href="/about">About</Link></div>
-
-
-
+                <div><Link href="/predio">Predios</Link></div>
+                <div><Link href="/owner">Propietarios</Link></div>
+                <div><Link href="/building">Construcciones</Link></div>
+                <div><Link href="/land">Terreno</Link></div>
             </header>
 
             <main>

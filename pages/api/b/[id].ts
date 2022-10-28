@@ -4,17 +4,19 @@ import { NextApiRequest, NextApiResponse } from "next";
 
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+
     const propietarioId = req.query.id;
-    console.log(req.body)
 
     switch (req.method) {
 
 
         case 'DELETE':
-            deleteConstruccion(res, propietarioId);
+            deleteConstruccion(propietarioId);
+            res.status(200).json({ message: 'Construccion Borrada' })
             break;
         case 'PUT':
-            putConstruccion(req, propietarioId);
+            putConstruccion(req);
+            res.status(200).json({ message: 'Construccion Actualizada' })
             break;
         default:
 
@@ -23,16 +25,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 }
 
 
-async function deleteConstruccion(res: NextApiResponse, ownerId: string | string[] | undefined) {
+async function deleteConstruccion(buildingId: string | string[] | undefined) {
 
-    const predio = await prisma.construccion.delete({
-        where: { id: Number(ownerId) }
+    await prisma.construccion.delete({
+        where: { id: Number(buildingId) }
     })
-    res.json(predio)
 
 }
-async function putConstruccion(req: NextApiRequest, ownerId: string | string[] | undefined) {
-
+async function putConstruccion(req: NextApiRequest) {
+    const ownerId = req.query.id;
     const { area_m2, type, floors, address } = req.body;
 
     try {
@@ -47,6 +48,7 @@ async function putConstruccion(req: NextApiRequest, ownerId: string | string[] |
                 address: address
             }
         })
+
     } catch (error) {
         console.error(error)
     }

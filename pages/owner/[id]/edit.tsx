@@ -8,6 +8,22 @@ import { prisma } from "../../../lib/prisma";
 const { Option } = Select;
 
 interface Owner {
+    owner: {
+        id: number,
+        id_type: string,
+        names: string,
+        lastnames: string,
+        address: string,
+        phone: string,
+        person_type: string,
+        NIT: number | undefined,
+        business_name: number | undefined,
+        email: string
+    }
+}
+
+interface FormData {
+
     id: number,
     id_type: string,
     names: string,
@@ -18,13 +34,15 @@ interface Owner {
     NIT: number | undefined,
     business_name: number | undefined,
     email: string
+
 }
 
 
-const Editar: NextPage<Owner> = (owner) => {
+const Editar: NextPage<Owner> = (own) => {
 
     const router = useRouter();
     const { id } = router.query
+    const owner = own.owner
     // Call this function whenever you want to
     // refresh props!
     const refreshData = () => {
@@ -33,7 +51,7 @@ const Editar: NextPage<Owner> = (owner) => {
     const [form] = Form.useForm();
 
 
-    async function updateOwner(data: Owner) {
+    async function updateOwner(data: FormData) {
 
         try {
             await fetch(`http://localhost:3000/api/o/${id}`, {
@@ -50,7 +68,7 @@ const Editar: NextPage<Owner> = (owner) => {
     }
 
 
-    const onFinish = async (data: Owner) => {
+    const onFinish = async (data: FormData) => {
 
         if (data.person_type == 'NATURAL') {
             data.NIT = undefined
@@ -60,7 +78,7 @@ const Editar: NextPage<Owner> = (owner) => {
 
         try {
             updateOwner(data)
-            form.resetFields();
+            refreshData()
         } catch (error) {
             console.log(error)
         }
@@ -74,7 +92,9 @@ const Editar: NextPage<Owner> = (owner) => {
     const [forma] = Form.useForm();
     const [formLayout, setFormLayout] = useState<LayoutType>('horizontal');
 
-    const [naturalFlag, setNaturalFlag] = useState<boolean>(true);
+    const [naturalFlag, setNaturalFlag] = useState<boolean>(
+        owner.person_type == 'NATURAL'
+    );
 
     const formItemLayout =
         formLayout === 'horizontal'
@@ -106,7 +126,16 @@ const Editar: NextPage<Owner> = (owner) => {
                 name="edit-owner"
                 onFinish={onFinish}
                 initialValues={{
-                    person_type: "NATURAL"
+                    id_type: owner.id_type,
+                    id: owner.id,
+                    names: owner.names,
+                    lastnames: owner.lastnames,
+                    address: owner.address,
+                    phone: owner.phone,
+                    NIT: owner.NIT,
+                    business_name: owner.business_name,
+                    person_type: owner.person_type,
+                    email: owner.email
                 }}>
                 <Form.Item label='Tipo de Documento' name='id_type' rules={[{ required: true }]}>
                     <Select
@@ -172,17 +201,18 @@ const Editar: NextPage<Owner> = (owner) => {
 
 export const getServerSideProps: GetServerSideProps = async (ctx: GetServerSidePropsContext) => {
     let ownerId;
+
     if (ctx.params != undefined) {
         ownerId = Number(ctx.params.id)
     } else {
         ownerId = 0;
     }
-
     const owner = await prisma.propietario.findUnique({
         where: {
             id: ownerId
         }
     })
+
     return {
         props: {
             owner

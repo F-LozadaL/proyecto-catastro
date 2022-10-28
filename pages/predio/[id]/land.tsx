@@ -9,32 +9,44 @@ import { prisma } from "../../../lib/prisma";
 import Link from "next/link";
 
 const { Option } = Select;
+
 const { Column, ColumnGroup } = Table;
 
-interface Building {
-    buildings: {
+interface Land {
+    land: {
         id: number,
         area_m2: number,
-        type: string,
-        floors: number,
-        address: string
-    }[]
+        value: number,
+        water: boolean,
+        territory_type: string,
+        Buildings: boolean
+    }
 }
 
 interface DataRow {
-    id: number
+    id: number,
+    landId: number,
+    water: boolean,
+    Buildings: boolean
 }
+
+
 
 interface FormData {
-    predioId: number,
-    buildingId: number
+    id: number,
+    landId: number
 }
 
-const Predio: NextPage<Building> = ({ buildings }) => {
+
+
+// ANT DESIGN STUFF -END
+
+const Terreno: NextPage<Land> = (landa) => {
 
     const router = useRouter();
     // Call this function whenever you want to
     // refresh props!
+    const land = landa.land
     const refreshData = () => {
         router.replace(router.asPath);
     }
@@ -44,6 +56,9 @@ const Predio: NextPage<Building> = ({ buildings }) => {
     type LayoutType = Parameters<typeof Form>[0]['layout'];
     const [form] = Form.useForm();
     const [formLayout, setFormLayout] = useState<LayoutType>('horizontal');
+
+    const [naturalHidden, setNaturalHidden] = useState<boolean>(true);
+
 
     const formItemLayout =
         formLayout === 'horizontal'
@@ -57,46 +72,45 @@ const Predio: NextPage<Building> = ({ buildings }) => {
         wrapperCol: { offset: 8, span: 16 },
     };
 
-
     const onFinish = async (data: FormData) => {
-
-        data.predioId = Number(id);
-        data.buildingId = Number(data.buildingId)
+        data.id = Number(id);
+        data.landId = Number(data.landId)
         try {
             form.resetFields();
-            addConstruccion(data)
-            // refreshData()
+            connectLand(data)
         } catch (error) {
             console.log(error)
         }
     };
+
     const onReset = () => {
         form.resetFields();
     };
-    // ANT DESIGN STUFF - END
 
-    async function addConstruccion(data: FormData) {
+    // ANT DESIGN STUFF -END
+    async function connectLand(data: FormData) {
         try {
-            await fetch('http://localhost:3000/api/p/addBuilding', {
-                body: JSON.stringify(data),
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                method: 'POST'
-            })
+            await fetch(`http://localhost:3000/api/p/connectLand`,
+                {
+                    body: JSON.stringify(data),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    method: 'PUT'
+                })
             refreshData()
         } catch (error) {
-            console.log(error);
+            console.log(error)
         }
     }
 
-    async function removeBuilding(buildingId: number) {
+    async function disconnectLand(ownerId: number) {
         const body = {
-            predioId: Number(id),
-            buildingId: buildingId
+            propertyId: Number(id),
+            landId: ownerId
         }
         try {
-            await fetch(`http://localhost:3000/api/p/removeBuilding`, {
+            await fetch(`http://localhost:3000/api/p/disconnectLand`, {
                 body: JSON.stringify(body),
                 headers: {
                     'Content-Type': 'application/json'
@@ -113,15 +127,14 @@ const Predio: NextPage<Building> = ({ buildings }) => {
 
     return (
         <PageLayout>
-
             <Form
                 {...formItemLayout}
                 form={form}
-                name="add-building"
-                initialValues={{ id: id }}
+                name="connect-land"
                 onFinish={onFinish}
             >
-                <Form.Item label='ID Construccion' name='buildingId' rules={[{ required: true }]}>
+
+                <Form.Item label='ID Terreno' name='landId' rules={[{ required: true }]}>
                     <Input />
                 </Form.Item>
                 <Form.Item>
@@ -132,19 +145,29 @@ const Predio: NextPage<Building> = ({ buildings }) => {
             </Form>
             <Divider />
 
-            <Table dataSource={buildings} rowKey="id">
+            <Table dataSource={[land]} rowKey="id">
 
+                <Column title="ID" dataIndex="id" key="id" />
                 <Column title="Area (m²)" dataIndex="area_m2" key="area_m2" />
-                <Column title="Tipo de Construccion" dataIndex="type" key="type" />
-                <Column title="# Pisos" dataIndex="floors" key="floors" />
-                <Column title="Direccion" dataIndex="address" key="address" />
+                <Column title="Valor" dataIndex="value" key="value" />
+                <Column title="Tipo de Terreno" dataIndex="territory_type" key="territory_type" />
+                <Column title="Fuentes de Agua" key="water"
+                    render={(_: any, record: DataRow) => (
+                        <Space>
+                            <p>{String(record.water)}</p>
+                        </Space>)} />
+                <Column title="Construcciones" key="Buildings"
+                    render={(_: any, record: DataRow) => (
+                        <Space>
+                            <p>{String(record.Buildings)}</p>
+                        </Space>)} />
                 <Column
                     title="Action"
                     key="action"
                     render={(_: any, record: DataRow) => (
                         <Space size="middle">
-                            <Button htmlType="button" onClick={() => { removeBuilding(record.id) }}>Desconectar</Button>
-                            <Link href={`/building/${record.id}/edit`}>Editar</Link>
+                            <Button htmlType="button" onClick={() => { disconnectLand(record.id) }}>Desconectar</Button>
+                            <Link href={`/land/${record.id}/edit`}>Editar</Link>
                         </Space>
                     )}
                 />
@@ -152,18 +175,16 @@ const Predio: NextPage<Building> = ({ buildings }) => {
 
             {/* <div>
                 <ul>
-                    {buildings.map(b => (
-                        <div key={b.id}>
+                    {owners.map(o => (
+                        <div key={o.id}>
                             <li >
-                                <span>{b.id}</span>
-                                <span>{b.type}</span>
-                                <span>{b.area_m2}</span>
-                                <span>{b.floors}</span>
-                                <Button htmlType="button" onClick={() => { removeBuilding(b.id) }}>X</Button>
-                                <Button htmlType="button" href={`/building/${b.id}/edit`}>Editar</Button>
-
+                                <span>{o.id}</span>
+                                <span>{o.id_type}</span>
+                                <span>{o.person_type}</span>
+                                <span>{o.names}</span>
+                                <Button htmlType="button" onClick={() => { disconnectOwner(o.id) }}>X</Button>
+                                <Button htmlType="button" href={`/owner/${o.id}/edit`}>Editar</Button>
                             </li>
-                            <Divider />
                         </div>
                     ))}
                 </ul>
@@ -174,27 +195,28 @@ const Predio: NextPage<Building> = ({ buildings }) => {
 }
 
 export const getServerSideProps: GetServerSideProps = async (ctx: GetServerSidePropsContext) => {
-    let predioId;
+    let propertyId;
     if (ctx.params != undefined) {
-        predioId = Number(ctx.params.id)
+        propertyId = Number(ctx.params.id)
     } else {
-        predioId = 0;
+        propertyId = 0;
     }
 
-    const buildingsa = await prisma.predio.findUnique({
+    const landa = await prisma.predio.findUnique({
         where: {
-            id: predioId
+            id: propertyId
         },
         select: {
-            buildings: true
+            land: true,
+
         }
     })
-    const buildings = buildingsa?.buildings
+    const land = landa?.land
     return {
         props: {
-            buildings
+            land
         }
     }
 }
 
-export default Predio;
+export default Terreno;
