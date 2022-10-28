@@ -169,7 +169,7 @@ const Land: NextPage<Land> = ({ lands }) => {
 
                 <Form.Item {...tailLayout}>
                     <Button type="primary" htmlType="submit">
-                        Submit
+                        Crear Terreno
                     </Button>
                     <Button htmlType="button" onClick={onReset}>
                         Reset

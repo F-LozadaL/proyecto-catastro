@@ -186,7 +186,7 @@ const Editar: NextPage<Owner> = (own) => {
                 </Form.Item>
                 <Form.Item {...tailLayout}>
                     <Button type="primary" htmlType="submit">
-                        Submit
+                        Actualizar Propietario
                     </Button>
                     <Button htmlType="button" onClick={onReset}>
                         Reset

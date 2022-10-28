@@ -167,7 +167,7 @@ const Predio: NextPage<Predios> = ({ predios }) => {
                             <Space size="middle">
 
                                 <Link href={`/predio/${record.id}/edit`}>Editar</Link>
-                                <Button htmlType="button" onClick={() => { deletePredio(record.id) }}>Delete</Button>
+                                <Button htmlType="button" onClick={() => { deletePredio(record.id) }}>*DELETE*</Button>
                                 <Button htmlType="button" href={`/predio/${record.id}/buildings`}>Construcciones</Button>
                                 <Button htmlType="button" href={`/predio/${record.id}/land`}>Terreno</Button>
                                 <Button htmlType="button" href={`/predio/${record.id}/owners`}>Propietarios</Button>

@@ -124,9 +124,9 @@ const Predio: NextPage<Building> = ({ buildings }) => {
                 <Form.Item label='ID Construccion' name='buildingId' rules={[{ required: true }]}>
                     <Input />
                 </Form.Item>
-                <Form.Item>
+                <Form.Item {...tailLayout}>
                     <Button type="primary" htmlType="submit">
-                        Submit
+                        Agregar Construccion
                     </Button>
                 </Form.Item>
             </Form>

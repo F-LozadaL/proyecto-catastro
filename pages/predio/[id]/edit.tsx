@@ -94,7 +94,7 @@ const Editar: NextPage<Predio> = ({ predio }) => {
                 </Form.Item>
                 <Form.Item {...tailLayout}>
                     <Button type="primary" htmlType="submit">
-                        Actualizar
+                        Actualizar Predio
                     </Button>
                     <Button htmlType="button" onClick={onReset}>
                         Reset

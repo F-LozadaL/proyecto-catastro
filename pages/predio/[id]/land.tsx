@@ -137,9 +137,9 @@ const Terreno: NextPage<Land> = (landa) => {
                 <Form.Item label='ID Terreno' name='landId' rules={[{ required: true }]}>
                     <Input />
                 </Form.Item>
-                <Form.Item>
+                <Form.Item {...tailLayout}>
                     <Button type="primary" htmlType="submit">
-                        Submit
+                        Conectar Terreno
                     </Button>
                 </Form.Item>
             </Form>

@@ -146,7 +146,7 @@ const Editar: NextPage<Land> = (bui) => {
                 </Form.Item>
                 <Form.Item {...tailLayout}>
                     <Button type="primary" htmlType="submit">
-                        Submit
+                        Actualizar Terreno
                     </Button>
                     <Button htmlType="button" onClick={onReset}>
                         Reset

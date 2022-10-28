@@ -188,7 +188,7 @@ const Owner: NextPage<Owners> = ({ owners }) => {
                 </Form.Item>
                 <Form.Item {...tailLayout}>
                     <Button type="primary" htmlType="submit">
-                        Submit
+                        Crear Propietario
                     </Button>
                     <Button htmlType="button" onClick={onReset}>
                         Reset

@@ -160,9 +160,9 @@ const Propietarios: NextPage<Owner> = ({ owners }) => {
                 <Form.Item label='ID Propietario' name='ownerId' rules={[{ required: true }]}>
                     <Input />
                 </Form.Item>
-                <Form.Item>
+                <Form.Item {...tailLayout}>
                     <Button type="primary" htmlType="submit">
-                        Submit
+                        Agregar Propietario
                     </Button>
                 </Form.Item>
             </Form>

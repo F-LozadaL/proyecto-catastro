@@ -150,7 +150,7 @@ const Building: NextPage<Building> = ({ buildings }) => {
 
                 <Form.Item {...tailLayout}>
                     <Button type="primary" htmlType="submit">
-                        Submit
+                        Crear Construccion
                     </Button>
                     <Button htmlType="button" onClick={onReset}>
                         Reset

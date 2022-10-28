@@ -130,7 +130,7 @@ const Editar: NextPage<Building> = (bui) => {
 
                 <Form.Item {...tailLayout}>
                     <Button type="primary" htmlType="submit">
-                        Submit
+                        Actualizar Construccion
                     </Button>
                     <Button htmlType="button" onClick={onReset}>
                         Reset
